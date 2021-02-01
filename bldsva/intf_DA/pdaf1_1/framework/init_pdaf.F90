@@ -65,18 +65,22 @@ SUBROUTINE init_pdaf()
         type_trans, type_sqrt, delt_obs, dim_state_p_count, dim_state_p_stride,&
         dim_lag
 #if defined CLMSA
-    ! kuw: get access to clm variables
-    USE shr_kind_mod , only : r8 => shr_kind_r8
-    USE clm_atmlnd   , only : clm_l2a, atm_l2a, clm_mapl2a
-    USE clmtype      , only : clm3, nameg
-    USE subgridAveMod, only : p2g, c2g
-    USE domainMod    , only : latlon_type
-    USE clm_varpar   , only : nlevsoi
-    USE decompMod    , only : get_proc_global, get_proc_bounds, adecomp
-    USE spmdGathScatMod , only : gather_data_to_master
-    USE spmdMod      , only : masterproc
+!    ! kuw: get access to clm variables
+!    USE shr_kind_mod , only : r8 => shr_kind_r8
+!    USE clm_atmlnd   , only : clm_l2a, atm_l2a, clm_mapl2a
+!    USE clmtype      , only : clm3, nameg
+!    USE subgridAveMod, only : p2g, c2g
+!    USE domainMod    , only : latlon_type
+!    USE clm_varpar   , only : nlevsoi
+!    USE decompMod    , only : get_proc_global, get_proc_bounds, adecomp
+!    USE spmdGathScatMod , only : gather_data_to_master
+!    USE spmdMod      , only : masterproc
     use enkf_clm_mod, only: clm_statevecsize
 #endif
+#if defined CLMFIVE
+    use enkf_clm_mod, only: clm_statevecsize
+#endif
+
     ! kuw end
 
     use, intrinsic :: iso_c_binding
@@ -153,6 +157,13 @@ SUBROUTINE init_pdaf()
        dim_state_p = clm_statevecsize
     end if
 #endif
+
+#if defined CLMFIVE
+    if (model == tag_model_clm) then
+       dim_state_p = clm_statevecsize
+    end if
+#endif
+
 
     IF (allocated(dim_state_p_count)) deallocate(dim_state_p_count)
     allocate(dim_state_p_count(npes_model))

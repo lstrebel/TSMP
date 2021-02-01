@@ -1,10 +1,10 @@
 #! /bin/ksh
 
 initSetup(){
-  defaultFDCLM="$rootdir/tsmp_eur11_eraint_eval/input/clm"
-  defaultFDCOS="$rootdir/tsmp_eur11_eraint_eval/input/cosmo"
-  defaultFDOAS="$rootdir/tsmp_eur11_eraint_eval/input/oasis3"
-  defaultFDPFL="$rootdir/tsmp_eur11_eraint_eval/input/parflow"
+  defaultFDCLM="/p/scratch/cslts/slts00/tsmp/TestCases/cordex/clm"
+  defaultFDCOS="/p/scratch/cslts/slts00/tsmp/TestCases/cordex/cosmo"
+  defaultFDOAS="/p/scratch/cslts/slts00/tsmp/TestCases/cordex/oasis3"
+  defaultFDPFL="/p/scratch/cslts/slts00/tsmp/TestCases/cordex/parflow"
 
 
   defaultNLCLM=$rootdir/bldsva/setups/cordex/lnd.stdin 
@@ -12,11 +12,11 @@ initSetup(){
   defaultNLPFL=$rootdir/bldsva/setups/cordex/coup_oas.tcl 
 
 
-  defaultNppn=128
+  defaultNppn=48
   defaultCLMProcX=3
   defaultCLMProcY=8
-  defaultCOSProcX=16
-  defaultCOSProcY=18
+  defaultCOSProcX=12
+  defaultCOSProcY=16
   defaultPFLProcX=9
   defaultPFLProcY=8
 
@@ -111,14 +111,7 @@ route "${cblue}>> finalizeSetup${cnormal}"
 	check
           sed "s,__nprocy_pfl__,$py_pfl," -i $rundir/ascii2pfb_slopes.tcl >> $log_file 2>> $err_file
 	check
-        if [ ! -f "$rundir/coup_oas.tcl" ]; then
-          comment "  parflow namelist coup_oas.tcl is copied to rundir. See cordex_JURECA_setup.ksh"
-          cp $namelist_pfl $rundir/coup_oas.tcl >> $log_file 2>> $err_file
-          check
-        fi
-          sed "s,__pfl_solidinput_filename__,$defaultFDPFL/geom_cordex0.11_436x424.pfsol," -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
-        comment "   create parflow db with tclsh (coup_oas.tcl)"
-          tclsh $rundir/coup_oas.tcl >> $log_file 2>> $err_file
+          sed "s,__pfl_solidinput_filename__,/p/project/cslts/slts06/forcings/testdata_EU_std/ParFlow/geom_cordex0.11_436x424.pfsol," -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
         check
 	comment "   create sloap pfb with tclsh"
           tclsh ./ascii2pfb_slopes.tcl >> $log_file 2>> $err_file

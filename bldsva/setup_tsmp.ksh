@@ -39,7 +39,6 @@ getDefaults(){
   def_dump_clm=""
   def_dump_cos=""
   def_dump_icon=""
-  def_processor=""
   def_dump_pfl=""	  
   def_queue=""
   def_px_clm=""
@@ -114,7 +113,6 @@ setDefaults(){
   dump_clm=$def_dump_clm
   dump_cos=$def_dump_cos
   dump_icon=$def_dump_icon
-  processor=$def_processor
   dump_pfl=$def_dump_pfl
   namelist_clm=$def_namelist_clm
   namelist_cos=$def_namelist_cos
@@ -209,7 +207,6 @@ setSelection(){
   if [[ $dump_clm == "" ]] then ; dump_clm=$defaultDumpCLM ; fi
   if [[ $dump_cos == "" ]] then ; dump_cos=$defaultDumpCOS ; fi
   if [[ $dump_icon == "" ]] then ; dump_icon=$defaultDumpICON ; fi
-  if [[ $processor == "" ]] then ; processor=$defaultprocessor ; fi
   if [[ $dump_pfl == "" ]] then ; dump_pfl=$defaultDumpPFL ; fi
 
   if [[ $exp_id == "__DATE__" ]] then
@@ -229,6 +226,7 @@ setSelection(){
 
   #Fix for cos /clm namelist because they differ in newer version.
   if [[ ${mList[1]} == clm4_0  ]] ; then ; namelist_clm+=4_0 ; fi
+  if [[ ${mList[1]} == clm5_0  ]] ; then ; namelist_clm+=5_0 ; fi
   if [[ ${mList[2]} == cosmo5_1  ]] ; then ; namelist_cos+=5_1 ; fi
 
 
@@ -547,7 +545,6 @@ interactive(){
                   if [[ $numb == 39 ]] ; then ; read dump_cos ; fi
                   if [[ $numb == 44 ]] ; then ; read dump_icon ; fi
                   if [[ $numb == 45 ]] ; then ; read compiler ; fi
-                  if [[ $numb == 46 ]] ; then ; read processor ; fi
                 done
                 interactive
           ;;
@@ -614,7 +611,6 @@ printState(){
   print "${cred}(38)${cnormal} Dump interval for clm.  (default=$def_dump_clm): ${cgreen}$dump_clm ${cnormal}"
   print "${cred}(39)${cnormal} Dump interval for cos.  (default=$def_dump_cos): ${cgreen}$dump_cos ${cnormal}"
   print "${cred}(43)${cnormal} Dump interval for icon.  (default=$def_dump_icon): ${cgreen}$dump_icon ${cnormal}"
-  print "${cred}(44)${cnormal} Processor CPU or GPU.  (default=$def_processor): ${cgreen}$processor ${cnormal}"
 }
 
 
@@ -742,8 +738,7 @@ getRoot(){
   USAGE+="[E:forcedirclm? Forcing directory for clm. This will replace the default forcing dir from the reference setup.]:[forcedirclm:='']"
   USAGE+="[f:namcos? Namelist for Cosmo. This script will always try to substitute the placeholders by the reference setup values. Make sure your namelist and placeholders are compatible with the reference setup. If you don't wont the substitution remove placeholders from your namelist. This flag will replace the default namelist from the reference setup ]:[namcos:='']"
   USAGE+="[Z:namicon? Namelist for icon. This script will always try to substitute the placeholders by the reference setup values. Make sure your namelist and placeholders are compatible with the reference setup. If you don't wont the substitution remove placeholders from your namelist. This flag will replace the default namelist from the reference setup ]:[namicon:='']"
-  USAGE+="[U:forcediricon? Forcing directory for ICON. This will replace the default forcing dir from the reference setup.]:[forcediricon:='']"
-  USAGE+="[F:forcedircosmo? Forcing directory for Cosmo. This will replace the default forcing dir from the reference setup.]:[forcedircosmo:='']"
+  USAGE+="[U:forcediricon? Forcing directory for Cosmo. This will replace the default forcing dir from the reference setup.]:[forcediricon:='']"
   USAGE+="[g:nampfl? Namelist for ParFlow. This script will always try to substitute the placeholders by the reference setup values. Make sure your namelist and placeholders are compatible with the reference setup. If you don't wont the substitution remove placeholders from your namelist. This flag will replace the default namelist from the reference setup ]:[nampfl:='']"
 #DA
   USAGE+="[h:namda? Namelist for data assimilation. This script will always try to substitute the placeholders by the reference setup values. Make sure your namelist and placeholders are compatible with the reference setup. If you don't wont the substitution remove placeholders from your namelist. This flag will replace the default namelist from the reference setup ]:[namda:='']"
@@ -756,7 +751,6 @@ getRoot(){
   USAGE+="[J:dumpclm? Dump interval for CLM (in hours).]:[dumpclm:='$def_dump_clm']"
   USAGE+="[K:dumpcos? Dump interval for Cosmo (in hours).]:[dumpcos:='$def_dump_cos']"
   USAGE+="[E:dumpicon? Dump interval for Cosmo (in hours).]:[dumpicon:='$def_dump_icon']"
-  USAGE+="[A:processor? Processore type CPU or GPU.]:[processor:='$def_processor']" 
   USAGE+="[L:dumppfl? Dump interval for ParFlow (in hours).]:[dumppfl:='$def_dump_pfl']"
 
 
@@ -822,7 +816,6 @@ getRoot(){
     J)  dump_clm="$OPTARG"; args=1 ;;
     K)  dump_cos="$OPTARG"; args=1 ;;
     E)  dump_icon="$OPTARG"; args=1 ;;
-    A)  processor="$OPTARG" ; args=1 ;;
 
 
     esac

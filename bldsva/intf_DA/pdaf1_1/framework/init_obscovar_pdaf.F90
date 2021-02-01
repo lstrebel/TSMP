@@ -116,6 +116,8 @@ SUBROUTINE init_obscovar_pdaf(step, dim_obs, dim_obs_p, covar, m_state_p, &
     do i=1,dim_obs
 #if defined CLMSA
       covar(i,i) = clm_obserr(obs_nc2pdaf(i))*clm_obserr(obs_nc2pdaf(i))
+#elif defined CLMFIVE
+      covar(i,i) = clm_obserr(obs_nc2pdaf(i))*clm_obserr(obs_nc2pdaf(i))
 #else
       covar(i,i) = pressure_obserr(obs_nc2pdaf(i))*pressure_obserr(obs_nc2pdaf(i))
 #endif

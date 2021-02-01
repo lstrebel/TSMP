@@ -20,6 +20,11 @@ OBJ =  dictionary.o\
 OBJCLM = enkf_clm_mod.o\
 		 mod_clm_statistics.o\
 		 enkf_clm.o\
+## clm 5 object
+OBJCLM5 = enkf_clm_mod_5.o\
+		mod_clm_statistics_5.o\
+		print_update_clm_5.o\
+		enkf_clm_5.o\
 
 ## parflow object files
 OBJPF = enkf_parflow.o\
@@ -56,6 +61,18 @@ mod_clm_statistics.o:
 
 print_update_clm.o:
 	$(PREP_C) $(FC) $(FCPP_FLAGS) $(FFLAGS) $(FINCS) -c print_update_clm.F90
+
+enkf_clm_mod_5.o:
+	$(PREP_C) $(FC) $(FCPP_FLAGS) $(FFLAGS) $(FINCS) -c enkf_clm_mod_5.F90
+
+enkf_clm_5.o:
+	$(PREP_C) $(FC) $(FCPP_FLAGS) $(FFLAGS) $(FINCS) -c enkf_clm_5.F90
+
+mod_clm_statistics_5.o:
+	$(PREP_C) $(FC) $(FCPP_FLAGS) $(FFLAGS) $(FINCS) -c mod_clm_statistics_5.F90
+
+print_update_clm_5.o:
+	$(PREP_C) $(FC) $(FCPP_FLAGS) $(FFLAGS) $(FINCS) -c print_update_clm_5.F90
 
 enkf_cosmo_mod.o:
 	$(PREP_C) $(FC) $(FCPP_FLAGS) $(FFLAGS) $(FINCS) -c enkf_cosmo_mod.F90

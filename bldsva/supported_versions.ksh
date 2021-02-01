@@ -11,26 +11,21 @@ typeset -A modelVersion
 
 # list of platforms with descriptions
 platforms+=(
+        ["CLUMA2"]="MIUB (Uni Bonn) - general purpose Linux Cluster"
         ["AGROCLUSTER"]="IBG3 (FZ-Juelich) - general purpose Linux Cluster"
         ["CCA2"]="ECMWF (Reading, UK) - general purpose Linux Cluster"
-        ["CLUMA2"]="MIUB (Uni Bonn) - general purpose Linux Cluster"
-        ["GENERIC_X86"]="Generic Linux x86 machine"
         ["JURECA"]="JSC (FZ-Juelich) - general purpose Linux Cluster"
+        ["GENERIC_X86"]="Generic Linux x86 machine"
         ["JUWELS"]="JSC (FZ-Juelich) - general purpose Linux Cluster"
-        ["JUSUF"]="JSC (FZ-Juelich) - general purpose Linux Cluster"
-        ["MISTRAL"]="DKRZ (Hamburg ) - general purpose Linux Cluster"
 )
 
 # list of available versions for a platform
 # IMPORTANT: add a leading and trailing " "(space)
 availability+=(
         ["JURECA"]=" 1.1.0 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT 1.1.0MCTPDAF \
-                     1.4.0MCT 1.4.1MCT 3.0.0MCTPDAF "
+                     1.4.0MCT 1.4.1MCT 3.0.0MCTPDAF 4.4.0MCT 4.4.0MCTPDAF "
         ["JUWELS"]=" 1.1.0 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT 1.1.0MCTPDAF 
-                     1.4.0MCT 1.4.1MCT 3.0.0MCTPDAF "
-        ["JUSUF"]=" 1.1.0 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT 1.1.0MCTPDAF 
-                     1.4.0MCT 1.4.1MCT 3.0.0MCTPDAF "
-        ["MISTRAL"]=" 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT 1.1.0MCTPDAF 4.0.0MCT 4.1.0MCT 3.0.0MCTPDAF "
+                     1.4.0MCT 1.4.1MCT 3.0.0MCTPDAF 4.4.0MCT 4.4.0MCTPDAF "
         ["AGROCLUSTER"]=" 1.1.0 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT 1.1.0MCTPDAF 3.0.0MCTPDAF "
         ["CCA2"]=" 1.1.0 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT "
         ["CLUMA2"]=" 1.1.0 1.1.0MCT 1.2.0 1.2.0MCT 2.1.0 2.1.0MCT 2.0.5 2.0.5MCT 3.0.0 3.0.0MCT 3.1.0 3.1.0MCT "
@@ -52,9 +47,11 @@ versions+=(
         ["3.0.0MCT"]="3.0.0 old models (clm3_4 and cosmo4_32) but new Parflow3_2 and with Oasis3-MCT"
         ["3.0.0MCTPDAF"]="3.0.0 with Oasis3-MCT and PDAF Data Assimilation"
  	["3.1.0"]="3.1.0 old clm3_5 but new cosmo5_1 and Parflow3_2"
-        ["3.1.0MCT"]="3.1.0 old clm3_5 but new cosmo5_1 and Parflow3_7 and with Oasis3-MCT"
+        ["3.1.0MCT"]="3.1.0 old clm3_5 but new cosmo5_1 and Parflow3_2 and with Oasis3-MCT"
 	["1.4.0MCT"]="4.0.0 old clm3_5 and Parflow but new icon-lem with Oasis3-MCT"
 	["1.4.1MCT"]="4.0.0 old clm3_5 but new icon-lem and Parflow3_2 with Oasis3-MCT"
+	["4.4.0MCT"]="4.0.0 new clm5_0 icon-lem and Parflow3_2 with Oasis3-MCT"
+        ["4.4.0MCTPDAF"]="4.0.0 with Oasis3-MCT and PDAF Data Assimilation"
 )
 
 
@@ -74,10 +71,12 @@ modelVersion+=(
         ["3.0.0MCT"]="oasis3-mct clm3_5 cosmo4_21 parflow3_2"
         ["3.0.0MCTPDAF"]="oasis3-mct clm3_5 cosmo4_21 parflow3_2 pdaf1_1"
         ["3.0.0"]="oasis3 clm3_5 cosmo4_21 parflow3_2"
-        ["3.1.0MCT"]="oasis3-mct clm3_5 cosmo5_1 parflow3_7"
+        ["3.1.0MCT"]="oasis3-mct clm3_5 cosmo5_1 parflow3_2"
         ["3.1.0"]="oasis3 clm3_5 cosmo5_1 parflow3_2"
 	["1.4.0MCT"]="oasis3-mct clm3_5-icon icon-lem parflow"
 	["1.4.1MCT"]="oasis3-mct clm3_5-icon icon-lem parflow3_2"
+	["4.4.0MCT"]="oasis3-mct clm5_0 icon-lem parflow3_2"
+        ["4.4.0MCTPDAF"]="oasis3-mct clm5_0 icon-lem parflow3_2 pdaf1_1"
 )
 
 # list of model combinations that are available for a version. (first is default) 
@@ -101,12 +100,15 @@ combinations+=(
         ["3.1.0"]=" clm-cos-pfl clm cos pfl clm-cos clm-pfl "
 	["1.4.0MCT"]=" clm-icon-pfl clm icon pfl clm-icon clm-pfl "
 	["1.4.1MCT"]=" clm-icon-pfl clm icon pfl clm-icon clm-pfl "
+	["4.4.0MCT"]=" clm-icon clm icon "
+        ["4.4.0MCTPDAF"]=" clm "
 )
 
 #list of supported testcases for a certain machine.
 setups+=(
         ["cordex"]="444x432 (12km res) atmosphere 436x424 (12km res) land domain of Europe and northern Afrika"
 	["nrw"]="150x150 (1km res) atmosphere 300x300 (0.5km res) land domain of North-Rhine-Westphalia"
+        ["nrw_5x"]="300x300 (0.5km res) land domain of North-Rhine-Westphalia setup for CLM 5"
 	["ideal300150"]="idealized domain with gridsize scaled to 150x150 (atmosphere) 300x300 (land)"
 	["ideal600300"]="idealized domain with gridsize scaled to 300x300 (atmosphere) 600x600 (land)"
 	["ideal1200600"]="idealized domain with gridsize scaled to 600x600 (atmosphere) 1200x1200 (land)"
@@ -124,10 +126,8 @@ setups+=(
 # list of setups that are available on a machine. (first is default)
 # IMPORTANT: add a leading and trailing " "(space)
 setupsAvail+=(
-	["JUWELS"]=" nrw ideal300150 ideal600300 ideal1200600 ideal24001200 cordex idealRTD multi-scale rur icon-ccs bonnRadar bonn seabreeze smresponse scalingStudy "
-        ["JUSUF"]=" nrw ideal300150 ideal600300 ideal1200600 ideal24001200 cordex idealRTD multi-scale rur icon-ccs bonnRadar bonn seabreeze smresponse scalingStudy "
-	["JURECA"]=" nrw ideal300150 ideal600300 ideal1200600 ideal24001200 cordex idealRTD multi-scale rur icon-ccs bonnRadar bonn seabreeze smresponse "
-        ["MISTRAL"]=" nrw cordex idealRTD  "
+	["JUWELS"]=" nrw nrw_5x ideal300150 ideal600300 ideal1200600 ideal24001200 cordex idealRTD multi-scale rur icon-ccs bonnRadar bonn seabreeze smresponse scalingStudy "
+	["JURECA"]=" nrw nrw_5x ideal300150 ideal600300 ideal1200600 ideal24001200 cordex idealRTD multi-scale rur icon-ccs bonnRadar bonn seabreeze smresponse "
 	["CLUMA2"]=" nrw idealRTD multi-scale idealLES "
 	["AGROCLUSTER"]=" nrw "
         ["CCA2"]=" nrw cordex "

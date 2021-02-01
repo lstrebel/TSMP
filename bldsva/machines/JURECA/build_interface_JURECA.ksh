@@ -4,17 +4,17 @@
 getMachineDefaults(){
 route "${cblue}>> getMachineDefaults${cnormal}"
   comment "   init lmod functionality"
-  . /p/software/jurecadc/lmod/lmod/init/ksh >> $log_file 2>> $err_file
+  . /usr/local/software/lmod/lmod/init/ksh >> $log_file 2>> $err_file
   check
   comment "   source and load Modules on JURECA"
-  . $rootdir/bldsva/machines/$platform/loadenvs.$compiler >> $log_file 2>> $err_file
+  . $rootdir/bldsva/machines/$platform/loadenvs >> $log_file 2>> $err_file
   check
 
 
   defaultMpiPath="$EBROOTPSMPI"
   defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
-  defaultGribPath="$EBROOTECCODES"
-  defaultGribapiPath="$EBROOTECCODES"
+  defaultGrib1Path="/p/project/cslts/local/jureca/grib1_DWD/grib1-DWD20061107.jureca_tc2015.07_psintel_opt_KGo2/lib"
+  defaultGribapiPath="$EBROOTGRIB_API"
   defaultJasperPath="$EBROOTJASPER"
   defaultTclPath="$EBROOTTCL"
   defaultHyprePath="$EBROOTHYPRE"
@@ -44,7 +44,7 @@ route "${cblue}<< finalizeMachine${cnormal}"
 createRunscript(){
 route "${cblue}>> createRunscript${cnormal}"
 comment "   copy JURECA module load script into rundirectory"
-  cp $rootdir/bldsva/machines/$platform/loadenvs.$compiler $rundir/loadenvs
+  cp $rootdir/bldsva/machines/$platform/loadenvs $rundir
 check
 
 mpitasks=$((numInst * ($nproc_icon + $nproc_cos + $nproc_clm + $nproc_pfl + $nproc_oas)))

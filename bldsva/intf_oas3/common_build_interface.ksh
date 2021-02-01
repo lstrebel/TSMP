@@ -227,65 +227,14 @@ route "${cblue}<<< c_make_cos${cnormal}"
 
 
 c_substitutions_cos(){
-
 route "${cblue}>>> c_substitutions_cos${cnormal}"
   comment "    copy oas3 interface to cosmo/src "
     patch $rootdir/bldsva/intf_oas3/${mList[2]}/oas3 $cosdir/src 
   check
-    cp  $rootdir/cosmo5_1/LOCAL/TWOMOM/src_twomom_sb* $cosdir/src
-  check
   comment "    replace files with coupling. Add files to cosmo/src "
-  # patch "$rootdir/bldsva/intf_oas3/${mList[2]}/tsmp/*" $cosdir/src 
+    patch "$rootdir/bldsva/intf_oas3/${mList[2]}/tsmp/*" $cosdir/src 
   check
-  comment "	copy the diff files to cosmo src : from $rootdir/bldsva/intf_oas3/${mList[2]}/pfile"
-    cp $rootdir/bldsva/intf_oas3/${mList[2]}/pfile/patch* $cosdir/src 
-  check
-  comment "     apply diff files on the original files using patch command in $cosdir/src "
-   /usr/bin/patch  -d $cosdir/src -i patch_src_radiation.f90.diff -o src_radiation1.f90
-    cp $cosdir/src/src_radiation1.f90 $cosdir/src/src_radiation.f90
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_data_fields.f90.diff -o data_fields1.f90  
-    cp $cosdir/src/data_fields1.f90  $cosdir/src/data_fields.f90
-  check
-#    patch  -d $cosdir/src -i patch_phillips_nucleation.incf.diff  -o phillips_nucleation1.incf >> $log_pfile 2>> $err_pfile
-#    cp $cosdir/src/phillips_nucleation1.incf $cosdir/src/phillips_nucleation.incf
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_lmorg.f90.diff -o lmorg1.f90 
-    cp $cosdir/src/lmorg1.f90 $cosdir/src/lmorg.f90
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_src_artifdata.f90.diff -o src_artifdata1.f90
-    cp $cosdir/src/src_artifdata1.f90 $cosdir/src/src_artifdata.f90
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_src_setup_vartab.f90.diff -o src_setup_vartab1.f90
-    cp $cosdir/src/src_setup_vartab1.f90 $cosdir/src/src_setup_vartab.f90
-  check
-    /usr/bin/patch -d $cosdir/src -i patch_src_twomom_sb.f90.diff -o src_twomom_sb1.f90
-    cp $cosdir/src/src_twomom_sb1.f90  $cosdir/src/src_twomom_sb.f90
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_environment.f90.diff -o environment1.f90
-    cp $cosdir/src/environment1.f90 $cosdir/src/environment.f90
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_organize_physics.f90.diff -o organize_physics1.f90
-    cp $cosdir/src/organize_physics1.f90 $cosdir/src/organize_physics.f90
-  check
-    /usr/bin/patch  -d $cosdir/src -i patch_src_allocation.f90.diff -o src_allocation1.f90
-    cp $cosdir/src/src_allocation1.f90 $cosdir/src/src_allocation.f90
-  check
-   /usr/bin/patch  -d $cosdir/src -i patch_src_gridpoints.f90.diff -o src_gridpoints1.f90
-    cp $cosdir/src/src_gridpoints1.f90 $cosdir/src/src_gridpoints.f90
-  check
-    /usr/bin/patch -d $cosdir/src -i patch_src_runge_kutta.f90.diff -o src_runge_kutta1.f90
-    cp $cosdir/src/src_runge_kutta1.f90 $cosdir/src/src_runge_kutta.f90
-  check
-   /usr/bin/patch -d $cosdir/src -i patch_src_slow_tendencies_rk.f90.diff -o src_slow_tendencies_rk1.f90
-    cp $cosdir/src/src_slow_tendencies_rk1.f90 $cosdir/src/src_slow_tendencies_rk.f90
-  check
-#    patch -d $cosdir/src -i patch_src_twomom_sb_interface.f90.diff  -o src_twomom_sb_interface1.f90
-#    cp $cosdir/src/src_twomom_sb_interface1.f90 $cosdir/src/src_twomom_sb_interface.f90
-#  check
-   
-    rm -rf $cosdir/src/*1.f90
-    rm -rf $cosdir/src/*1.incf
+
 #DA
   if [[ $withPDAF == "true" ]]  then
     comment "    sed PDAF fix into cosmo files "  
@@ -351,7 +300,6 @@ check
 comment "  sed date to namelist"
   sed "s/init_y_bldsva/$(date '+%Y' -d "$initDate")/" -i $rundir/lmrun_uc >> $log_file 2>> $err_file
 check
-comment "  sed init_m_bldsva to namelist"  
   sed "s/init_m_bldsva/$(date '+%m' -d "$initDate")/" -i $rundir/lmrun_uc >> $log_file 2>> $err_file
 check
   sed "s/init_d_bldsva/$(date '+%d' -d "$initDate")/" -i $rundir/lmrun_uc >> $log_file 2>> $err_file
@@ -375,7 +323,7 @@ cnts=$(( ( $(date -u '+%s' -d "${startDate}") - $(date -u '+%s' -d "${initDate}"
 comment "  sed output interval to namelist"
 sed "s/__ncomb_start__/$cnts/" -i $rundir/lmrun_uc  >> $log_file 2>> $err_file
 check
-sed "s/__dump_cos_interval__/ $(python -c "print ($dump_cos*(3600/$dt_cos))")/" -i $rundir/lmrun_uc  >> $log_file 2>> $err_file
+sed "s/__dump_cos_interval__/ $(python -c "print $dump_cos*(3600/$dt_cos)")/" -i $rundir/lmrun_uc  >> $log_file 2>> $err_file
 check
 
 if [[ $restfile_cos != "" ]] then
@@ -475,7 +423,7 @@ route "${cblue}>>> c_setup_oas${cnormal}"
   if [[ $withCESM == "true" || $withOASMCT == "true" ]] ; then ; ncpl_exe3=$nproc_clm ; fi
 
 
-  if [[ $withICON == "true" ]] then
+  if [[ $withICON == "true" ]]; then
     sed "s/ngiconx/$gx_icon/" -i $rundir/namcouple >> $log_file 2>> $err_file
   check
     sed "s/cplfreq1/$cplfreq1/" -i $rundir/namcouple >> $log_file 2>> $err_file
@@ -596,8 +544,6 @@ route "${cblue}>>> c_configure_clm${cnormal}"
   comment "    create new build dir"
     mkdir -p $clmdir/build >> $log_file 2>> $err_file
   check
-  comment "    copy oas_clm_init.F90 to  $clmdir/src/oas3"
-    cp $rootdir/bldsva/intf_oas3/${mList[1]}/oas3/oas_clm_init.F90 $clmdir/src/oas3
 
     spmd="on"       # settings are [on   | off       ] (default is off)
     maxpft="1"        # settings are 4->17               (default is 4)
@@ -673,9 +619,7 @@ route "${cblue}<<< c_make_clm${cnormal}"
 
 c_substitutions_clm(){
 route "${cblue}>>> c_substitutions_clm${cnormal}"
-  comment "    create oas3 dir in $clmdir/src"
-    mkdir -p $clmdir/src/oas3 >> $log_file 2>> $err_file
-  check
+# CLM 3.5 substitutions
   comment "    copy oas3 interface to clm/src "
     patch $rootdir/bldsva/intf_oas3/${mList[1]}/mct $clmdir/src
   check
@@ -691,14 +635,46 @@ route "${cblue}>>> c_substitutions_clm${cnormal}"
   check
     patch $rootdir/bldsva/intf_DA/pdaf1_1/tsmp/${mList[1]}/iniTimeConst.F90 $clmdir/bld/usr.src	
   check
-  fi	
+  fi
 route "${cblue}<<< c_substitutions_clm${cnormal}"
 }
 
 
 c_setup_clm(){
 route "${cblue}>>> c_setup_clm${cnormal}"
+if [[ ${mList[1]} == "clm5_0" ]]; then
+comment "  CLM5.0 setup"
 
+comment "  sed rundir to namelist"
+  sed "s,__rundir__,$rundir," -i $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+
+comment "  sed dt to namelist"
+  sed "s,__dt_clm_bldsva__,$dt_clm," -i $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+
+comment "  sed forcingdir to namelist"
+  sed "s,__forcingdir__,$forcingdir_clm," -i $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+comment "  sed dump interval namelist"
+  sed "s,__dump_clm_interval__,$dump_clm," -i $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+comment "  sed runtime to namelist"
+  if [[ $withICON == "true" ]]; then
+    runstep_clm=$((($runhours*3600 + $cplfreq1/10)/$dt_clm))
+  else
+    runstep_clm=$((($runhours*3600 + $cplfreq1)/$dt_clm))
+  fi
+  sed "s,__runstep_clm_bldsva__,$runstep_clm," -i $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+comment "  add axe rights to clm namelist"
+    chmod 755 $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+comment "  run clm namelist"
+    $rundir/lnd.stdin >> $log_file 2>> $err_file
+check
+# Below default clm 3.5 setup
+else
 comment "  sed rundir to namelist"
   sed "s,__rundir__,$rundir," -i $rundir/lnd.stdin >> $log_file 2>> $err_file
 check
@@ -751,6 +727,7 @@ if [[ $withPDAF == "true" ]] ; then
   cp $rundir/lnd.stdin $rundir/lnd.stdin_$(printf "%05d" $(($instance-$startInst)))     
 fi
 
+fi 
 route "${cblue}<<< c_setup_clm${cnormal}"
 }
 
@@ -761,45 +738,143 @@ route "${cblue}<<< c_setup_clm${cnormal}"
 
 
 c_configure_pfl(){
+
+
 route "${cblue}>>> c_configure_pfl${cnormal}"
-  
-  comment "    cd to pfl build directory "
-    cd $PARFLOW_BLD >> $log_file 2>> $err_file
+    if [[ $withOAS == "true" ]] ; then 
+      flagsSim+="--with-amps=oas3 --with-oas3 "  
+      flagsTools+="--with-amps=oas3 --with-oas3 "
+    else 
+#DA
+      if [[ $withPDAF == "true" ]] ; then
+        flagsSim+="--with-amps=da " 
+        flagsTools+="--with-amps=da "
+      else
+        flagsSim+="--with-amps=mpi1 " 
+        flagsTools+="--with-amps=mpi1 "
+      fi
+    fi
+
+    flagsSim+="--prefix=$pfldir --with-hypre=$hyprePath --with-silo=$siloPath --with-amps-sequential-io --enable-timing"
+    flagsTools+="--prefix=$pfldir --with-hypre=$hyprePath --with-silo=$siloPath --with-tcl=$tclPath --with-amps-sequential-io"
+
+  comment "    cd to pfsimulator"
+    cd $pfldir/pfsimulator >> $log_file 2>> $err_file
   check
-  export CC=$pcc 
-  export FC=$pfc 
-  export F77=$pf77 
-  export CXX=$pcxx
-  
-  comment "    configure pfsimulator and pftools"
-  cmake ../ $flagsSim >> $log_file 2>> $err_file
+
+    if [[ -e "$pfldir/pfsimulator/Makefile" ]] ; then
+      comment "    make pfsimulator very clean"
+        make -f $pfldir/pfsimulator/Makefile veryclean >> $log_file 2>> $err_file
+      check
+    fi 
+
+  comment "    configure pfsimulator"
+    export SCOREP_WRAPPER=off
+    if [[ $withICON == "true" ]]; then
+    $pfldir/pfsimulator/configure CC="$pcc" FC="$pfc" F77="$pf77" CXX="$pcxx" $flagsSim --enable-opt="$optComp" FCFLAGS="$fcflagsSim -DCOUP_OAS_ICON" CFLAGS="$cflagsSim -DCOUP_OAS_ICON" >> $log_file 2>> $err_file
+    else
+    $pfldir/pfsimulator/configure CC="$pcc" FC="$pfc" F77="$pf77" CXX="$pcxx" $flagsSim --enable-opt="$optComp" FCFLAGS="$fcflagsSim" CFLAGS="$cflagsSim" >> $log_file 2>> $err_file
+    fi
+  check
+  comment "    patch pfsimulator/parflow_lib/problem_phase_rel_perm.c "
+    sed -i "s@inline double VanGLookupSpline@double VanGLookupSpline@" $pfldir/pfsimulator/parflow_lib/problem_phase_rel_perm.c >> $log_file 2>> $err_file
+    sed -i "s@inline double VanGLookupLinear@double VanGLookupLinear@" $pfldir/pfsimulator/parflow_lib/problem_phase_rel_perm.c >> $log_file 2>> $err_file
+  check
+  comment "    cd to pftools"
+    cd $pfldir/pftools >> $log_file 2>> $err_file
+  check
+
+    if [[ -e "$pfldir/pftools/Makefile" ]] ; then
+      comment "    make pftools very clean"
+        make -f $pfldir/pftools/Makefile veryclean >> $log_file 2>> $err_file
+      check
+    fi
+
+  comment "    configure pftools"
+    $pfldir/pftools/configure $flagsTools >> $log_file 2>> $err_file
+  check
+  export SKIN_MODE=mpi
+
+  comment "    sed libs to /parflow_exe/Makefile"
+    sed -i "s@__libs__@$libsSim@" $pfldir/pfsimulator/parflow_exe/Makefile >> $log_file 2>> $err_file
   check
 route "${cblue}<<< c_configure_pfl${cnormal}"
 }
 
 c_make_pfl(){
 route "${cblue}>>> c_make_pfl${cnormal}"
-  comment "    cd to pfl build directory "
-  cd $PARFLOW_BLD >> $log_file 2>> $err_file
+comment "    cd to pfsimulator" 
+  cd $pfldir/pfsimulator >> $log_file 2>> $err_file
 check
-comment "    make pfsimulator and pftools"
-  make  >> $log_file 2>> $err_file
+comment "    make pfsimulator"
+  export SCOREP_WRAPPER=on
+  make -f $pfldir/pfsimulator/Makefile >> $log_file 2>> $err_file
 check
-comment "    make install pfsimulator and pftools"
-  make install >> $log_file 2>> $err_file
-check
-comment "    cp pfl bin to $bindir"
-  cp -R $pfldir/bin/bin $bindir >> $log_file 2>> $err_file
+comment "    make install pfsimulator"
+  make -f $pfldir/pfsimulator/Makefile install >> $log_file 2>> $err_file
 check
 
-comment "    cp binary to $bindir"
- cp $pfldir/bin/bin/parflow $bindir >> $log_file 2>> $err_file
+  export SCOREP_WRAPPER=off
+comment "    cd to pftools"
+  cd $pfldir/pftools >> $log_file 2>> $err_file
 check
+comment "    make pftools"
+  make -f $pfldir/pftools/Makefile >> $log_file 2>> $err_file
+check
+comment "    make install pftools"
+  make -f $pfldir/pftools/Makefile install >> $log_file 2>> $err_file
+check
+comment "    cp pfl bin to $bindir"
+  cp -R $pfldir/bin $bindir >> $log_file 2>> $err_file
+check
+#DA
+  if [[ $withPDAF == "true" ]]; then
+    comment "    cp libs to $bindir/libs"
+      cp $pfldir/pfsimulator/lib/* $bindir/libs >> $log_file 2>> $err_file
+    check
+  else
+    comment "    cp binary to $bindir"
+      cp $pfldir/bin/parflow $bindir >> $log_file 2>> $err_file
+    check
+  fi
+  export SCOREP_WRAPPER=on
 route "${cblue}<<< c_make_pfl${cnormal}"
 }
 
 c_substitutions_pfl(){
 route "${cblue}>>> c_substitutions_pfl${cnormal}"
+  comment "    copy oas3 interface to parflow/pfsimulator/amps "
+    patch $rootdir/bldsva/intf_oas3/${mList[3]}/oas3 $pfldir/pfsimulator/amps 
+  check
+
+  comment "    copy fix for hardwired MPI_COMM_WORLD in amps "
+    patch "$rootdir/bldsva/intf_oas3/${mList[3]}/tsmp/amps*" $pfldir/pfsimulator/amps/mpi1
+  check
+    patch "$rootdir/bldsva/intf_oas3/${mList[3]}/tsmp/pf_pfmg*" $pfldir/pfsimulator/parflow_lib 
+  check
+#DA
+  if [[ $withPDAF == "true" ]]; then
+    comment "    sed DA amps into configure"
+      sed "/\"\$with_amps\" in\s*/ a\
+  da\)\\
+    AMPS=da\\
+  ;;
+      " -i $pfldir/pfsimulator/configure $pfldir/pftools/configure >> $log_file 2>> $err_file
+    check
+    comment "    copy fix for PDAF into $pfldir"
+      patch $rootdir/bldsva/intf_DA/pdaf1_1/tsmp/${mList[3]}/parflow_proto.h $pfldir/pfsimulator/parflow_lib 
+    check
+      patch $rootdir/bldsva/intf_DA/pdaf1_1/tsmp/${mList[3]}/solver_richards.c $pfldir/pfsimulator/parflow_lib 
+    check
+      patch $rootdir/bldsva/intf_DA/pdaf1_1/tsmp/${mList[3]}/da $pfldir/pfsimulator/amps
+    check
+      sed "s/MPI_COMM_WORLD/amps_CommWorld/g" -i $pfldir/pfsimulator/parflow_lib/pf_pfmg.c
+    check
+      sed "s/MPI_COMM_WORLD/amps_CommWorld/g" -i $pfldir/pfsimulator/parflow_lib/pf_pfmg_octree.c
+    check
+      sed "s/MPI_COMM_WORLD/amps_CommWorld/g" -i $pfldir/pfsimulator/parflow_lib/pf_smg.c
+    check
+  fi
 
 route "${cblue}<<< c_substitutions_pfl${cnormal}"
 }
@@ -807,12 +882,9 @@ route "${cblue}<<< c_substitutions_pfl${cnormal}"
 c_setup_pfl(){
 route "${cblue}>>> c_setup_pfl${cnormal}"
 
-  if [ ! -f "$rundir/coup_oas.tcl" ]; then
-    comment "  $rundir/coup_oas.tcl does not exist, is copied, see c_setup_pfl()"
+  comment "   copy parflow namelist to rundir."
     cp $namelist_pfl $rundir/coup_oas.tcl >> $log_file 2>> $err_file
-    check
-  fi
-
+  check
   comment "   sed nproc x to pfl namelist."
     sed "s/__nprocx_pfl_bldsva__/$px_pfl/" -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
   check
@@ -833,7 +905,7 @@ route "${cblue}>>> c_setup_pfl${cnormal}"
   check
   comment "   sed end time to pfl namelist."
 #    sed "s/__stop_pfl_bldsva__/$runstep_clm/" -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
-sed "s/__stop_pfl_bldsva__/$(python -c "print (${runhours} + ${base_pfl})")/" -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
+    sed "s/__stop_pfl_bldsva__/$(python -c "print ${runhours} + ${base_pfl}")/" -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
   check
   comment "   sed dump interval to pfl namelist."
     sed "s/__dump_pfl_interval__/$dump_pfl/" -i $rundir/coup_oas.tcl >> $log_file 2>> $err_file
@@ -907,7 +979,7 @@ route "${cblue}>>> c_setup_da${cnormal}"
     sed "s/__dt__/$dt_pfl/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
   check
   comment "   sed endtime into pdaf namelist."
-  sed "s/__endtime__/$(python -c "print (${runhours} + ${base_pfl})")/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
+    sed "s/__endtime__/$(python -c "print ${runhours} + ${base_pfl}")/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
   check
   comment "   sed clmproc into pdaf namelist."
     sed "s/__clmproc__/$nproc_clm/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
@@ -916,7 +988,7 @@ route "${cblue}>>> c_setup_da${cnormal}"
     sed "s/__cosproc__/$nproc_cos/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
   check 
   comment "   sed dtmult into pdaf namelist."
-  sed "s/__dtmult__/$(python -c "print (${dt_pfl} * 3600 / ${dt_cos})")/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
+    sed "s/__dtmult__/$(python -c "print ${dt_pfl} * 3600 / ${dt_cos}")/" -i $rundir/enkfpf.par >> $log_file 2>> $err_file
   check 
 
 route "${cblue}<<< c_setup_da${cnormal}"

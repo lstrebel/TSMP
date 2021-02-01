@@ -21,7 +21,7 @@ getDefaults(){
   # pathes will be set to tested platform defaults if empty
   def_mpiPath=""
   def_ncdfPath=""
-  def_gribPath=""
+  def_grib1Path=""
   def_tclPath=""
   def_hyprePath=""
   def_siloPath=""
@@ -38,7 +38,6 @@ getDefaults(){
 
   #compiler options, CPS remove hardwiring of compilers
   def_compiler="Gnu"  # will be set to Gnu if empty
-  def_processor="CPU"
 
   #profiling
   def_profiling="no"
@@ -71,7 +70,6 @@ setDefaults(){
   bindir=$def_bindir
   optComp=$def_optComp
   compiler=$def_compiler
-  processor=$def_processor
   profiling=$def_profiling
   oasdir=$def_oasdir
   clmdir=$def_clmdir
@@ -84,7 +82,7 @@ setDefaults(){
   ncdfPath=$def_ncdfPath
   lapackPath=$def_lapackPath
   pncdfPath=$def_pncdfPath
-  gribPath=$def_gribPath
+  grib1Path=$def_grib1Path
   tclPath=$def_tclPath
   hyprePath=$def_hyprePath
   siloPath=$def_siloPath
@@ -120,13 +118,12 @@ setDefaults(){
 clearMachineSelection(){
   mpiPath=""
   ncdfPath=""
-  gribPath=""
+  grib1Path=""
   tclPath=""
   hyprePath=""
   siloPath=""
   optComp=""
   compiler=""
-  processor=""
   clearPathSelection
 }
 
@@ -147,7 +144,7 @@ setSelection(){
 
   if [[ $mpiPath == "" ]] then ; mpiPath=$defaultMpiPath ; fi
   if [[ $ncdfPath == "" ]] then ; ncdfPath=$defaultNcdfPath  ; fi
-  if [[ $gribPath == "" ]] then ; gribPath=$defaultGribPath ; fi
+  if [[ $grib1Path == "" ]] then ; grib1Path=$defaultGrib1Path ; fi
   if [[ $tclPath == "" ]] then ; tclPath=$defaultTclPath ; fi
   if [[ $hyprePath == "" ]] then ; hyprePath=$defaultHyprePath ; fi
   if [[ $siloPath == "" ]] then ; siloPath=$defaultSiloPath ; fi
@@ -159,7 +156,6 @@ setSelection(){
   
   #compiler selection
   if [[ $compiler == "" ]] then ; compiler=$defaultcompiler ; fi
-  if [[ $processor == "" ]] then ; processor=$defaultprocessor ; fi
 }
 
 finalizeSelection(){
@@ -209,7 +205,6 @@ setCombination(){
 compileClm(){
 route "${cblue}> c_compileClm${cnormal}"
   comment "  source clm interface script"
-    comment "intf_oas3/${mList[1]}/arch/${platform}/build_interface_${mList[1]}_${platform}.ksh"
     . ${rootdir}/bldsva/intf_oas3/${mList[1]}/arch/${platform}/build_interface_${mList[1]}_${platform}.ksh >> $log_file 2>> $err_file
   check
     always_clm
@@ -218,10 +213,13 @@ route "${cblue}> c_compileClm${cnormal}"
   comment "  backup clm dir to: $clmdir"
       rm -rf $clmdir >> $log_file 2>> $err_file
   check
-    # remove '-icon' from the mList[1] name
-    clmicon="${mList[1]}"
-    clmicon=${clmicon%'-icon'}
-    cp -rf ${rootdir}/${clmicon} $clmdir >> $log_file 2>> $err_file
+    if [[ $withICON == "true" ]]; then
+      clmicon="${mList[1]}"
+      clmicon=${clmicon%'-icon'}
+      cp -rf ${rootdir}/${clmicon} $clmdir >> $log_file 2>> $err_file
+    else
+      cp -rf ${rootdir}/${mList[1]} $clmdir >> $log_file 2>> $err_file
+    fi
   check
     fi
     if [[ ${options["clm"]} == "build" || ${options["clm"]} == "fresh" ]] ; then
@@ -326,12 +324,11 @@ route "${cblue}> c_compileParflow${cnormal}"
     always_pfl
     if [[ ${options["pfl"]} == "skip" ]] ; then ; route "${cblue}< c_compileParflow${cnormal}" ;return  ;fi 
     if [[ ${options["pfl"]} == "fresh" ]] ; then 
-     comment "  backup pfl dir to: $pfldir"
-       if [ -d $pfldir ] ; then ; rm -rf $pfldir >> $log_file 2>> $err_file ;fi
-     check
-     comment "  copy ${rootdir}/${mList[3]} to $pfldir"
-       if [ -d ${rootdir}/${mList[3]} ] ;then ; cp -rf ${rootdir}/${mList[3]} $pfldir >> $log_file 2>> $err_file ;fi
-     check
+  comment "  backup pfl dir to: $pfldir"
+      rm -rf $pfldir >> $log_file 2>> $err_file
+  check
+      cp -rf ${rootdir}/${mList[3]} $pfldir >> $log_file 2>> $err_file
+  check
     fi
     if [[ ${options["pfl"]} == "build" || ${options["pfl"]} == "fresh" ]] ; then
       substitutions_pfl
@@ -349,7 +346,7 @@ route "${cblue}< c_compileParflow${cnormal}"
 
 #DA
 compileDA(){
-route "${cblue}> c_compileParflow${cnormal}"
+route "${cblue}> c_compileDA${cnormal}"
   comment "  source da interface script"
     . ${rootdir}/bldsva/intf_DA/${mList[4]}/arch/${platform}/build_interface_${mList[4]}_${platform}.ksh >> $log_file 2>> $err_file
   check
@@ -489,7 +486,7 @@ interactive(){
 		  if [[ $numb == 17 ]] ; then ; read siloPath ; fi
 		  if [[ $numb == 18 ]] ; then ; read hyprePath ; fi
 	 	  if [[ $numb == 19 ]] ; then ; read tclPath ; fi
-		  if [[ $numb == 20 ]] ; then ; read gribPath ; fi
+		  if [[ $numb == 20 ]] ; then ; read grib1Path ; fi
 		  if [[ $numb == 21 ]] ; then ; read ncdfPath ; fi
  		  if [[ $numb == 22 ]] ; then ; read pncdfPath ; fi
 		  if [[ $numb == 23 ]] ; then ; read lapackPath ; fi
@@ -508,7 +505,6 @@ interactive(){
                   if [[ $numb == 27 ]] ; then ; read readCLM ; fi
 		  if [[ $numb == 28 ]] ; then ; read freeDrain ; fi
                   if [[ $numb == 29 ]] ; then ; read compiler ; fi
-                  if [[ $numb == 30 ]] ; then ; read processor ; fi
 		done	
 		interactive
 	  ;;
@@ -547,17 +543,17 @@ printState(){
   print "${cred}(17)${cnormal} silo path (default=$defaultSiloPath): ${cgreen}$siloPath ${cnormal}"
   print "${cred}(18)${cnormal} hypre path (default=$defaultHyprePath): ${cgreen}$hyprePath ${cnormal}"
   print "${cred}(19)${cnormal} tcl path (default=$defaultTclPath): ${cgreen}$tclPath ${cnormal}"
-  print "${cred}(20)${cnormal} grib path (default=$defaultGribPath): ${cgreen}$gribPath ${cnormal}"
+  print "${cred}(20)${cnormal} grib1 path (default=$defaultGrib1Path): ${cgreen}$grib1Path ${cnormal}"
   print "${cred}(21)${cnormal} ncdf path (default=$defaultNcdfPath): ${cgreen}$ncdfPath ${cnormal}"
   print "${cred}(22)${cnormal} pncdf path (default=$defaultPncdfPath): ${cgreen}$pncdfPath ${cnormal}"
   print "${cred}(23)${cnormal} lapack path (default=$defaultLapackPath): ${cgreen}$lapackPath ${cnormal}"
+  print "${cred}(29)${cnormal} compiler (default=$defaultcompiler): ${cgreen}$compiler ${cnormal}"
   print "${cred}(24)${cnormal} optComp (default=$defaultOptComp): ${cgreen}$optComp ${cnormal}"
   print "${cred}(25)${cnormal} profiling (default=$def_profiling): ${cgreen}$profiling ${cnormal}"
   print "${cred}(26)${cnormal} Couple-Scheme (default=$def_cplscheme): ${cgreen}$cplscheme ${cnormal}"
   print "${cred}(27)${cnormal} readCLM: Consistently read CLM-mask (default=$def_readCLM): ${cgreen}$readCLM ${cnormal}"
   print "${cred}(28)${cnormal} Compiles ParFlow with free drainage feature (default=$def_freeDrain): ${cgreen}$freeDrain ${cnormal}"
-  print "${cred}(29)${cnormal} compiler (default=$defaultcompiler): ${cgreen}$compiler ${cnormal}"
-  print "${cred}(30)${cnormal} processor (default=$defaultprocessor): ${cgreen}$processor ${cnormal}"
+  print "${cred}(24)${cnormal} compiler (default=$defaultcompiler): ${cgreen}$compiler ${cnormal}"
 }
 
 check(){
@@ -691,7 +687,7 @@ getRoot(){
   #automatically determine root dir
   cpwd=`pwd`
   if [[ "$0" == '/'*  ]] ; then
-    #absolute path
+    #absolut path
     estdir=`echo "$0" | sed 's@/bldsva/build_tsmp.ksh@@'` #remove bldsva/configure machine to get rootpath
     call=$0
   else
@@ -736,8 +732,8 @@ getRoot(){
   USAGE+="[i:interactive?Interactive mode - command line arguments and defaults will be overwritten during the interactive session (This is the default without arguments).]"
   USAGE+="[a:avail?Prints a listing of every machine with available versions. The script will exit afterwards.]"
   USAGE+="[t:tutorial?Prints a tutorial/description on how to add new versions and platforms to this script. The script will exit afterwards.]"
-  USAGE+="[R:rootdir?Absolute path to TerrSysMP root directory.]:[path:='$def_rootdir']"
-  USAGE+="[B:bindir?Absolute path to bin directory for the builded executables. bin/MACHINE_DATE will be taken if ''.]:[path:='$def_bindir']"
+  USAGE+="[R:rootdir?Absolut path to TerrSysMP root directory.]:[path:='$def_rootdir']"
+  USAGE+="[B:bindir?Absolut path to bin directory for the builded executables. bin/MACHINE_DATE will be taken if ''.]:[path:='$def_bindir']"
    
   USAGE+="[v:version?Tagged TerrSysMP version. Note that not every version might be implemented on every machine. Run option -a, --avail to get a listing.]:[version:='$version']"
   USAGE+="[m:machine?Target Platform. Run option -a, --avail to get a listing.]:[machine:='$def_platform']"
@@ -745,7 +741,6 @@ getRoot(){
   USAGE+="[p:profiling?Makes necessary changes to compile with a profiling tool if available.]:[profiling:='$def_profiling']"
   USAGE+="[o:optimization?Compiler optimisation flags.]:[optimization:='$def_optComp']"
   USAGE+="[O:compiler?Compiler option flags.]:[compiler:='$def_compiler']"
-  USAGE+="[A:processor?Processor GPU or CPU.]:[processor:='$def_processor']"
   USAGE+="[c:combination? Combination of component models.]:[combination:='$def_combination']"
   USAGE+="[C:cplscheme? Couple-Scheme for CLM/COS coupling.]:[cplscheme:='$def_cplscheme']"
   USAGE+="[r:readclm? Flag to consistently read in CLM mask.]:[readclm:='$def_readCLM']"
@@ -775,7 +770,7 @@ getRoot(){
   USAGE+="[H:hyprepath?Include Path for Hypre. The machine default will be taken if ''.]:[hyprepath:='$hyprePath']"
   USAGE+="[S:silopath?Include Path for Silo. The machine default will be taken if ''.]:[silopath:='$siloPath']"
   USAGE+="[T:tclpath?Include Path for TCL. The machine default will be taken if ''.]:[tclpath:='$tclPath']"
-  USAGE+="[G:gribpath?Include Path for Grib1. The machine default will be taken if ''.]:[gribpath:='$gribPath']"
+  USAGE+="[G:grib1path?Include Path for Grib1. The machine default will be taken if ''.]:[grib1path:='$grib1Path']"
   USAGE+="[M:mpipath?Include Path for MPI. The machine default will be taken if ''.]:[mpipath:='$mpiPath']"
   USAGE+="[N:ncdfpath?Include Path for NetCDF. The machine default will be taken if ''.]:[ncdfpath:='$ncdfPath']"
   USAGE+="[P:pncdfpath?Include Path for PNetCDF. The machine default will be taken if ''.]:[pncdfpath:='$pncdfPath']"
@@ -819,13 +814,12 @@ getRoot(){
 
     M)  mpiPath="$OPTARG" ; args=1 ;;
     N)  ncdfPath="$OPTARG" ; args=1 ;;
-    G)  gribPath="$OPTARG" ; args=1 ;;
+    G)  grib1Path="$OPTARG" ; args=1 ;;
     T)  tclPath="$OPTARG" ; args=1 ;;
     H)  hyprePath="$OPTARG" ; args=1 ;;
     S)  siloPath="$OPTARG" ; args=1 ;; 
     P)  pnetcdfPath="$OPTARG" ; args=1 ;;
-    L)  lapackPath="$OPTARG" ; args=1 ;;
-    A)  processor="$OPTARG" ; args=1 ;;
+    L)  lapackPath="$OPTARG" ; args=1 ;; 
     esac
   done
 

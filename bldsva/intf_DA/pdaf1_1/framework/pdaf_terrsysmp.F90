@@ -35,6 +35,10 @@ program pdaf_terrsysmp
 #if (defined CLMSA)
     use enkf_clm_mod, only: da_comm, statcomm, update_clm, clmupdate_swc, clmprint_et
     use mod_clm_statistics
+#elif defined CLMFIVE
+    use mod_parallel_model, only : mpi_comm_world
+    use enkf_clm_mod, only: da_comm, statcomm, update_clm, clmupdate_swc, clmprint_et
+    use mod_clm_statistics
 #elif (defined COUP_OAS_PFL || defined COUP_OAS_COS)
 !#else
     use enkf_clm_mod,only: statcomm, clmprint_et
@@ -59,6 +63,10 @@ program pdaf_terrsysmp
     ! set certain variables in component models
 #if (defined CLMSA)
     da_comm = comm_model 
+#endif
+
+#if defined CLMFIVE
+    da_comm = comm_model
 #endif
 
 #if (defined COUP_OAS_COS)
@@ -89,6 +97,10 @@ program pdaf_terrsysmp
       !write(*,*) 'initialize statcomm (CLM) with COMM_couple'
       statcomm = COMM_couple
 #endif
+
+#if defined CLMFIVE
+      statcomm = COMM_couple
+#endif
     end if 
 
     ! time loop
@@ -101,8 +113,8 @@ program pdaf_terrsysmp
 
         call assimilate_pdaf()
         
-        !call MPI_BARRIER(MPI_COMM_WORLD, IERROR)
-        !print *,"Finished assimilation", tcycle
+        call MPI_BARRIER(MPI_COMM_WORLD, IERROR)
+        print *,"Finished assimilation", tcycle
 
         !call print_update_pfb()
 #if defined CLMSA
@@ -111,13 +123,20 @@ program pdaf_terrsysmp
           call print_update_clm(tcycle,total_steps)
         endif
         !print *,"Finished printing updated values"
+#elif defined CLMFIVE
+        if((model.eq.tag_model_clm).and.(clmupdate_swc.ne.0)) then
+          call update_clm()
+          call print_update_clm(tcycle,total_steps)
+        endif
 #else
         call update_tsmp()
 #endif
 
         ! print et statistics
 #if !defined PARFLOW_STAND_ALONE
-        if(model.eq.tag_model_clm .and. clmprint_et.eq.1) call write_clm_statistics(tcycle,total_steps)
+        if(model.eq.tag_model_clm .and. clmprint_et.eq.1) then 
+          call write_clm_statistics(tcycle,total_steps)
+        endif
 #endif
         !print *,"Finished update_tsmp()"
 
@@ -139,6 +158,7 @@ program pdaf_terrsysmp
     !print *, "model: finalized, rank ", mype_world
 
     ! close mpi
+#ifndef CLMFIVE
     call mpi_finalize(ierror)
-
+#endif
 end program pdaf_terrsysmp

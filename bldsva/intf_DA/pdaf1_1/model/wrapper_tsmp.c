@@ -47,8 +47,11 @@ void initialize_tsmp() {
   /* assign model number (0=clm, 1=parflow, 2=cosmo) */
   MPI_Comm_size(MPI_COMM_WORLD,&size);
   MPI_Comm_rank(MPI_COMM_WORLD,&rank);
+  /*printf("rank %d size %d nreal %d \n", rank, size, nreal); */
   coupcol = rank / (size/nreal);
   subrank = mype_model;
+
+  /*printf("coupcol %d subrank %d \n", coupcol, subrank); */
 
   /* define number of first model realisation (for input/output filenames) */
   coupcol = coupcol + startreal;
@@ -63,6 +66,7 @@ void initialize_tsmp() {
   else{
     model = 2;
   }
+
   /* ParFlow, CLM, COSMO */
   if (subrank < nprocpf) {
     model = 1;
@@ -74,7 +78,7 @@ void initialize_tsmp() {
     model = 2;
   }
 
-
+  /*printf("model %d \n", model);*/
 
   /* create instance specific input file for ParFLow and CLM*/
   //sprintf(pfinfile ,"%s_%05d",pfinfile,coupcol);
@@ -109,6 +113,15 @@ void initialize_tsmp() {
   if(model == 0) {
 #if defined COUP_OAS_PFL || defined CLMSA || defined COUP_OAS_COS
     clm_init(clminfile);
+#elif defined CLMFIVE
+    /*printf("CLM init will be next %s - %i of %i\n", clminfile, coupcol, nreal);*/
+    int pdaf_id;
+    int pdaf_max;
+
+    pdaf_id = (int) coupcol;
+    pdaf_max = (int) nreal;
+
+    clm5_init(clminfile, &pdaf_id, &pdaf_max);
 #endif
   }
   if(model == 1) {
@@ -149,7 +162,7 @@ void initialize_tsmp() {
 void finalize_tsmp() {
 
   if(model == 0) {
-#if defined COUP_OAS_PFL || defined CLMSA || defined COUP_OAS_COS
+#if defined COUP_OAS_PFL || defined CLMSA || defined CLMFIVE || defined COUP_OAS_COS
     clm_finalize();
 #endif
   }
@@ -175,7 +188,7 @@ void finalize_tsmp() {
 void integrate_tsmp() {
 
   if(model == 0){
-#if defined COUP_OAS_PFL || defined CLMSA || defined COUP_OAS_COS
+#if defined COUP_OAS_PFL || defined CLMSA || defined CLMFIVE || defined COUP_OAS_COS
     int tsclm;
     tsclm = (int) ( (double) da_interval / dt );
     //printf("CLM: advancing (%d clm time steps)\n",tsclm);

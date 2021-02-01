@@ -37,6 +37,7 @@ void read_enkfpar(char *parname);
 void enkf_ensemblestatistics (double* dat, double* mean, double* var, int size, MPI_Comm comm);
 void enkf_printstatistics_pfb (double *dat, char* name, int cycle, char* prefix, int dim);
 extern void clm_init(char *s);
+extern void clm5_init(char *s, int pdaf_id, int pdaf_max);
 extern void clm_advance(int *ntstep);
 extern void clm_finalize();
 extern void cosmo_init();

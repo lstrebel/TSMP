@@ -30,6 +30,9 @@ SUBROUTINE localize_covar_pdaf(dim_state, dim_obs, HP, HPH)
 #if defined CLMSA
     ONLY:  tag_model_parflow, tag_model_clm, &
            enkf_subvecsize
+#elif defined CLMFIVE
+    ONLY:  tag_model_parflow, tag_model_clm, &
+           enkf_subvecsize
 #else
     ONLY: tag_model_parflow, tag_model_clm, &
           enkf_subvecsize, &
@@ -93,6 +96,7 @@ SUBROUTINE localize_covar_pdaf(dim_state, dim_obs, HP, HPH)
 
 
 #ifndef CLMSA
+#ifndef CLMFIVE
   IF(model==tag_model_parflow)THEN
     call C_F_POINTER(xcoord,xcoord_fortran,[enkf_subvecsize])
     call C_F_POINTER(ycoord,ycoord_fortran,[enkf_subvecsize])
@@ -135,5 +139,5 @@ SUBROUTINE localize_covar_pdaf(dim_state, dim_obs, HP, HPH)
     
   ENDIF ! model==tag_model_parflow
 #endif
-
+#endif
 END SUBROUTINE localize_covar_pdaf

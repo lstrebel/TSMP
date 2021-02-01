@@ -6,21 +6,33 @@ route "${cblue}>> getMachineDefaults${cnormal}"
   comment "   init lmod functionality"
   . /gpfs/software/juwels/lmod/lmod/init/ksh >> $log_file 2>> $err_file
   check
-  comment "   source and load Modules on JUWELS: loadenvs.$compiler"
+  comment "   source and load Modules on JUWELS"
   . $rootdir/bldsva/machines/$platform/loadenvs.$compiler >> $log_file 2>> $err_file
   check
 
+
   defaultMpiPath="$EBROOTPSMPI"
   defaultNcdfPath="$EBROOTNETCDFMINFORTRAN"
-  defaultGribPath="$EBROOTECCODES"
-  defaultGribapiPath="$EBROOTECCODES"
+  #defaultGrib1Path="/gpfs/homea/slts/slts00/local/jureca/grib1_DWD/grib1-DWD20110128.jureca_tc2015.07_psintel_opt_KGo/lib"
+
+  #CPS Remove hardwiring of compiler, introducing compiler switch 
+  if [[ $compiler == "Intel" ]] ; then
+  #Intel GRIB
+  defaultGrib1Path="/p/project/cslts/local/juwels/grib1_DWD/lib/"
+
+  elif [[ $compiler == "Gnu" ]] ; then
+  #GNU GRIB
+  defaultGrib1Path="/p/project/cslts/local/juwels/DWD-libgrib1_20110128/lib"
+  fi
+
+  defaultGribapiPath="$EBROOTGRIB_API"
   defaultJasperPath="$EBROOTJASPER"
   defaultTclPath="$EBROOTTCL"
   defaultHyprePath="$EBROOTHYPRE"
   defaultSiloPath="$EBROOTSILO"
   defaultLapackPath="$EBROOTIMKL"
   defaultPncdfPath="$EBROOTPARALLELMINNETCDF"
-#
+
   # Default Compiler/Linker optimization
   defaultOptC="-O2"
 
@@ -28,8 +40,8 @@ route "${cblue}>> getMachineDefaults${cnormal}"
   if [[ $profiling == "scalasca" ]] ; then ; profComp="" ; profRun="scalasca -analyse" ; profVar=""  ;fi
 
   # Default Processor settings
-  defaultwtime="00:10:00"
-  defaultQ="devel"
+  defaultwtime="01:00:00"
+  defaultQ="batch"
 
 route "${cblue}<< getMachineDefaults${cnormal}"
 }
@@ -55,39 +67,11 @@ if [[ $withPDAF == "true" ]] ; then
 else
   srun="srun --multi-prog slm_multiprog_mapping.conf"
 fi
-if [[ $processor == "GPU" ]]; then
-cat << EOF >> $rundir/tsmp_slm_run.bsh
-#!/bin/bash
-#SBATCH --account=slts
-#SBATCH --job-name="TSMP_Hetero"
-#SBATCH --output=hetro_job-out.%j
-#SBATCH --error=hetro_job-err.%j
-#SBATCH --time=00:10:00
-#SBATCH -N 4 --ntasks-per-node=48 -p batch
-#SBATCH hetjob
-#SBATCH -N 1 --ntasks-per-node=48 -p batch
-#SBATCH hetjob
-#SBATCH -N 1 --ntasks-per-node=4 --gres=gpu:4 -p develgpus
-
-cd $rundir
-source $rundir/loadenvs
-export LD_LIBRARY_PATH="/p/scratch/cslts/ghasemi1/TSMP_github/TSMP/parflow3_7_JUWELS_3.1.0MCT_clm-cos-pfl/rmm/lib:\$LD_LIBRARY_PATH"
-date
-echo "started" > started.txt
-rm -rf YU*
-
-srun --pack-group=0 ./lmparbin_pur : --pack-group=1 ./clm : --pack-group=2 ./parflow cordex0.11
-date
-echo "ready" > ready.txt
-exit 0
-EOF
-
-else
 
 cat << EOF >> $rundir/tsmp_slm_run.bsh
 #!/bin/bash
 
-#SBATCH --job-name="TSMP"
+#SBATCH --job-name="TerrSysMP"
 #SBATCH --nodes=$nnodes
 #SBATCH --ntasks=$mpitasks
 #SBATCH --ntasks-per-node=$nppn
@@ -96,7 +80,7 @@ cat << EOF >> $rundir/tsmp_slm_run.bsh
 #SBATCH --time=$wtime
 #SBATCH --partition=$queue
 #SBATCH --mail-type=NONE
-#SBATCH --account=slts 
+#SBATCH --account=hbn33 
 
 export PSP_RENDEZVOUS_OPENIB=-1
 
@@ -113,7 +97,6 @@ exit 0
 
 EOF
 
-fi
 
 
 
