@@ -62,6 +62,8 @@ module enkf_clm_mod
   integer(c_int),bind(C,name="clmprefixlen") :: clmprefixlen
   integer :: statcomm
 
+  logical :: newgridcell
+
   contains
 
 #if defined CLMFIVE 
@@ -126,13 +128,14 @@ module enkf_clm_mod
   subroutine set_clm_statevec()
     use clm_instMod, only : soilstate_inst, waterstate_inst
     use clm_varpar   , only : nlevsoi
+    use ColumnType , only : col
     use shr_kind_mod, only: r8 => shr_kind_r8
     implicit none
     real(r8), pointer :: swc(:,:)
     real(r8), pointer :: psand(:,:)
     real(r8), pointer :: pclay(:,:)
     real(r8), pointer :: porgm(:,:)
-    integer :: i,j,cc=1,offset=0
+    integer :: i,j,jj,g,cc=1,offset=0
 
     swc   => waterstate_inst%h2osoi_vol_col
     psand => soilstate_inst%cellsand_col
@@ -208,7 +211,7 @@ module enkf_clm_mod
     real(r8), pointer :: h2osoi_ice(:,:)
     real(r8)  :: rliq,rice
 
-    integer :: i,j,cc=1,offset=0
+    integer :: i,j,jj,g,cc=1,offset=0
 
     swc   => waterstate_inst%h2osoi_vol_col
     watsat => soilstate_inst%watsat_col
@@ -247,7 +250,7 @@ module enkf_clm_mod
               ! update liquid water content
               h2osoi_liq(jj,i) = swc(jj,i) * dz(jj,i)*denh2o*rliq
               ! update ice content
-              h2osoi_ice(j,i) = swc(j,i) * dz(j,i)*denice*rice
+              h2osoi_ice(jj,i) = swc(jj,i) * dz(jj,i)*denice*rice
             end do
             cc = cc + 1
           end do
